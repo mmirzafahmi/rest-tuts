@@ -6,3 +6,4 @@ scikit-neuralnetwork
 numpy
 fuzzywuzzy
 uwsgi
+xlrd
