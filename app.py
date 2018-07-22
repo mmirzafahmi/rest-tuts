@@ -126,5 +126,6 @@ def pre_processing():
         return new.to_html()
 
 
-app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
 
