@@ -1,0 +1,8 @@
+pandas
+Flask
+werkzeug
+scikit-learn
+scikit-neuralnetwork
+numpy
+fuzzywuzzy
+uwsgi
