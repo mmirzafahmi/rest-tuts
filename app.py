@@ -119,9 +119,9 @@ def pre_processing():
         proba = pd.DataFrame(proba, columns=['Prob_Score'])
         rec = pd.DataFrame(rec, columns=['Rec'])
 
-        columns = new.columns
-        new = pd.DataFrame(new, columns=columns)
-        new = pd.concat([new, proba, rec], axis=1)
+        #columns = new.columns
+        #new = pd.DataFrame(new, columns=columns)
+        new = pd.concat([old, proba, rec], axis=1)
 
         return new.to_html()
 
