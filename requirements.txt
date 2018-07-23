@@ -7,5 +7,5 @@ numpy
 fuzzywuzzy
 uwsgi
 xlrd
-Lasagne
+https://github.com/Lasagne/Lasagne/archive/master.zip
 scipy
