@@ -52,9 +52,9 @@ def pre_processing():
     if request.method == 'POST':
         f = request.files['file']
         f.save(secure_filename(f.filename))
-        old = pd.read_csv(f)
+        old = pd.read_excel(f)
         conv = {old.columns[4]: str, old.columns[5]: str, old.columns[8]: str, old.columns[27]: pd.to_datetime}
-        new = pd.read_csv(f, converters=conv)
+        new = pd.read_excel(f, converters=conv)
 
         user_profile = []
         used_col = []
