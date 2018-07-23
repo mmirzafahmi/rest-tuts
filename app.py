@@ -52,9 +52,9 @@ def pre_processing():
     if request.method == 'POST':
         f = request.files['file']
         f.save(secure_filename(f.filename))
-        old = pd.read_excel(f)
+        old = pd.read_csv(f)
         conv = {old.columns[4]: str, old.columns[5]: str, old.columns[8]: str, old.columns[27]: pd.to_datetime}
-        new = pd.read_excel(f, converters=conv)
+        new = pd.read_csv(f, converters=conv)
 
         user_profile = []
         used_col = []
@@ -98,7 +98,7 @@ def pre_processing():
 
         scaler = Normalizer()
 
-        X = scaler.fit_transform(new.drop('Result', axis=1))
+        X = scaler.fit_transform(new.dropna().drop('Result', axis=1))
 
         # Load classifier
         filename = 'model/finalized_model.sav'
