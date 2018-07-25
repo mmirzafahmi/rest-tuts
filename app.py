@@ -21,8 +21,13 @@ def pre_processing():
     def cleaning_data(df_new, df_old, uc):
 
         df_new = df_new.drop(uc, axis=1)
+
         df_new = df_new.set_index([df_old.columns[27]])
-        df_new = df_new.dropna()
+
+        for i, j in zip(df_new[df_new.columns[0]], df_new[df_new.columns[1]]):
+            if pd.isna(i):
+                df_new = df_new.replace({df_new.columns[0]: i}, value=j)
+
         df_new = df_new.sort_index()
 
         return pd.DataFrame(df_new)
@@ -68,17 +73,19 @@ def pre_processing():
             else:
                 unused_col.append(new.columns[col])
 
+        res = old['Result']
         new = cleaning_data(new, old, unused_col)
         old = cleaning_data(old, old, unused_col)
 
-        list_date = {'June': list(new[new.index.month == 6].index.unique().format())}
+        month = pd.DatetimeIndex(new.index).month
+        list_date = {str(month): list(new[new.index.month == month].index.unique().format())}
 
-        iterator = {'June': {'Adr_Reg': [], 'Shp_Reg': [], 'Ord_Mail': []}}
+        iterator = {str(month): {'Adr_Reg': [], 'Shp_Reg': [], 'Ord_Mail': []}}
         keys = ['Adr_Reg', 'Shp_Reg', 'Ord_Mail']
 
         for k, us_p, in zip(keys, user_profile):
-            for d in list_date['June']:
-                iterator['June'][k].append(new.loc[d, us_p])
+            for d in list_date[str(month)]:
+                iterator[str(month)][k].append(new.loc[d, us_p])
 
         most_key = ['Adr_Reg_Most', 'Shp_Reg_Most', 'Ord_Mail_Most']
         avg_key = ['Adr_Reg_Avg', 'Shp_Reg_Avg', 'Ord_Mail_Avg']
@@ -86,19 +93,19 @@ def pre_processing():
                     'Adr_Reg_Avg': [], 'Shp_Reg_Avg': [], 'Ord_Mail_Avg': []}
 
         for key, most in zip(keys, most_key):
-            for series in iterator['June'][key]:
+            for series in iterator[str(month)][key]:
                 dict_tmp[most].extend(most_similar(series, most))
 
         for key, avg in zip(keys, avg_key):
-            for series in iterator['June'][key]:
+            for series in iterator[str(month)][key]:
                 dict_tmp[avg].extend(avg_similar(series, avg))
 
         new = pd.DataFrame(dict_tmp)
-        new['Result'] = old['Result'].values
+        old['Result'] = res.values
 
         scaler = Normalizer()
 
-        X = scaler.fit_transform(new.dropna().drop('Result', axis=1))
+        X = scaler.fit_transform(new)
 
         # Load classifier
         filename = 'model/finalized_model.sav'
@@ -117,7 +124,7 @@ def pre_processing():
                 rec = np.append(rec, 'NO FRAUD')
 
         proba = pd.DataFrame(proba, columns=['Prob_Score'])
-        rec = pd.DataFrame(rec, columns=['Rec'])
+        rec = pd.DataFrame(rec, columns=['Prediction'])
 
         old = pd.DataFrame(old).reset_index()
         new = pd.concat([old, proba, rec], axis=1)
